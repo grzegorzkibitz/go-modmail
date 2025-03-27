@@ -1,6 +1,7 @@
 package config
 
 import (
+	logger "discord-bot-tickets/logging"
 	"fmt"
 	"github.com/diamondburned/arikawa/v3/discord"
 	_ "github.com/joho/godotenv/autoload"
@@ -25,7 +26,7 @@ type MySqlConfig struct {
 type DiscordConfig struct {
 	Token      string
 	GuildID    discord.GuildID
-	CategoryID string
+	CategoryID discord.ChannelID
 }
 
 type ErrMissingEnvVar string
@@ -48,11 +49,17 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("invalid DISCORD_GUILD_ID: %v", err)
 	}
 
+	channelID, err := strconv.ParseUint(os.Getenv("DISCORD_CATEGORY_ID"), 10, 64)
+	if err != nil {
+		logger.Info("No/Invalid channel ID provided, using default")
+		channelID = uint64(discord.NullChannelID)
+	}
+
 	cfg := &Config{
 		Discord: DiscordConfig{
 			Token:      os.Getenv("DISCORD_TOKEN"),
 			GuildID:    discord.GuildID(guildID),
-			CategoryID: os.Getenv("DISCORD_CATEGORY_ID"),
+			CategoryID: discord.ChannelID(channelID),
 		},
 		DB: MySqlConfig{
 			Username: os.Getenv("MYSQL_USER"),

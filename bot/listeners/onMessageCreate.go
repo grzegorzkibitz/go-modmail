@@ -24,49 +24,17 @@ func HandleMessageCreate(service *services.BotService, event *gateway.MessageCre
 		return
 	}
 
-	// If the user has an active ticket, update it
 	if ticket != nil {
 		if err = tickets.UpdateTicket(service.Config(), service.State(), event.Author, tickets.RegularMessage{Message: event.Message}); err != nil {
 			logger.Error(err.Error())
 		}
-
-		if err = messages.ReactToMessage(service.State(), event.Message, "✅"); err != nil {
+	} else {
+		if _, err = tickets.CreateTicket(service.Config(), service.State(), event.Author, event.Message); err != nil {
 			logger.Error(err.Error())
 		}
-
-		return
-	}
-
-	// If the user does not have an active ticket, create one
-	if _, err = tickets.CreateTicket(service.Config(), service.State(), event.Author, event.Message); err != nil {
-		logger.Error(err.Error())
 	}
 
 	if err = messages.ReactToMessage(service.State(), event.Message, "✅"); err != nil {
 		logger.Error(err.Error())
-	}
-}
-
-// HandleChannelDelete handles channel deletion events and cleans up the ticket cache
-func HandleChannelDelete(service *services.BotService, event *gateway.ChannelDeleteEvent) {
-	// Check if the deleted channel was a ticket
-	isTicket, err := tickets.IsChannelTicket(*service.State(), &event.Channel)
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
-
-	if isTicket {
-		// Get the author from the channel topic
-		author, err := tickets.GetAuthorFromChannel(service.State(), &event.Channel)
-		if err != nil {
-			logger.Error(err.Error())
-			return
-		}
-
-		if author != nil {
-			// Remove the ticket from the cache
-			tickets.RemoveTicketFromCache(author.ID)
-		}
 	}
 }

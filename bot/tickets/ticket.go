@@ -100,9 +100,10 @@ func (m SlashCommandMessage) GetAuthor() discord.User {
 // Returns: a pointer to a Ticket and an error if any
 func CreateTicket(config *config.Config, state *state.State, author discord.User, message discord.Message) (*Ticket, error) {
 	data := api.CreateChannelData{
-		Name:  author.Username,
-		Type:  discord.GuildText,
-		Topic: "User: " + author.ID.String(),
+		Name:       author.Username,
+		Type:       discord.GuildText,
+		Topic:      "User: " + author.ID.String(),
+		CategoryID: config.Discord.CategoryID,
 	}
 
 	channel, err := state.CreateChannel(config.Discord.GuildID, data)

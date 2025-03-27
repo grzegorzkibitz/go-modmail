@@ -2,7 +2,6 @@ package listeners
 
 import (
 	"discord-bot-tickets/bot/services"
-
 	"github.com/diamondburned/arikawa/v3/gateway"
 )
 

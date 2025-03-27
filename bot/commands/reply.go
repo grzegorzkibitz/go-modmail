@@ -29,24 +29,36 @@ func ReplyCommand(ctx context.Context, service *services.BotService, data cmdrou
 		}
 	}
 
-	// get the author of the ticket from the channel
-	author, err := tickets.GetAuthorFromChannel(service.State(), data.Event.Channel)
+	// Get the channel where the command was used
+	channel, err := service.State().Channel(data.Event.ChannelID)
 	if err != nil {
 		return &api.InteractionResponseData{
-			Content: option.NewNullableString("There was an error determining whether this channel is a ticket."),
+			Content: option.NewNullableString("Error getting channel information."),
 			Flags:   discord.EphemeralMessage,
 		}
 	}
 
-	if author == nil {
+	// Get the ticket owner from the channel topic
+	ticketOwner, err := tickets.GetAuthorFromChannel(service.State(), channel)
+	if err != nil {
 		return &api.InteractionResponseData{
-			Content: option.NewNullableString("This channel is not a ticket"),
+			Content: option.NewNullableString("Error getting ticket owner information."),
+			Flags:   discord.EphemeralMessage,
+		}
+	}
+
+	if ticketOwner == nil {
+		return &api.InteractionResponseData{
+			Content: option.NewNullableString("This channel is not a ticket."),
 			Flags:   discord.EphemeralMessage,
 		}
 	}
 
 	// Update the ticket with the reply
-	if err = tickets.UpdateTicket(service.Config(), service.State(), *author, tickets.SlashCommandMessage{Message: message}); err != nil {
+	if err = tickets.UpdateTicket(service.Config(), service.State(), *ticketOwner, tickets.SlashCommandMessage{
+		Message: message,
+		Author:  data.Event.Member.User,
+	}); err != nil {
 		logger.Error(err.Error())
 		return &api.InteractionResponseData{
 			Content: option.NewNullableString("Error updating ticket."),

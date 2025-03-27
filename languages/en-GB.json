@@ -1,0 +1,57 @@
+{
+    "general": {
+        "errors": {
+            "channel": {
+                "message": "Error getting channel information."
+            },
+            "owner": {
+                "message": "Error getting ticket owner information."
+            },
+            "generic": {
+                "message": "An error occurred. Please try again."
+            },
+            "not_a_ticket": {
+                "message": "This command can only be used in ticket channels."
+            },
+            "no_message": {
+                "message": "Please provide a message to send."
+            }
+        },
+        "success": {
+            "generic": {
+                "message": "Operation completed successfully."
+            }
+        }
+    },
+    "commands": {
+        "close": {
+            "success": {
+                "message": "Ticket closed successfully."
+            },
+            "error": {
+                "message": "Error closing ticket channel."
+            }
+        },
+        "reply": {
+            "success": {
+                "message": "Message sent successfully."
+            },
+            "error": {
+                "message": "Error updating ticket."
+            }
+        }
+    },
+    "embeds": {
+        "ticket_closed": {
+            "title": {
+                "message": "Ticket Closed"
+            },
+            "description": {
+                "message": "Your ticket has been closed. If you have any more queries, feel free to type here again."
+            },
+            "footer": {
+                "message": "ModMail"
+            }
+        }
+    }
+} 

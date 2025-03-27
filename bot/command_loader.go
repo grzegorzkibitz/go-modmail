@@ -15,14 +15,14 @@ type CommandHandler func(ctx context.Context, service *services.BotService, data
 
 // CommandRegistry holds all registered commands
 var CommandRegistry = map[string]CommandHandler{
-	"ping":  commands.PingCommand,
 	"reply": commands.ReplyCommand,
+	"close": commands.CloseCommand,
 }
 
 // CommandData holds all command data
 var commandData = []api.CreateCommandData{
-	{Name: "ping", Description: commands.GetPingDescription(), DescriptionLocalizations: commands.GetPingLocale()},
 	{Name: "reply", Description: commands.GetReplyDescription(), DescriptionLocalizations: commands.GetReplyLocale(), Options: commands.GetReplyOptions()},
+	{Name: "close", Description: commands.GetCloseDescription(), DescriptionLocalizations: commands.GetCloseLocale()},
 }
 
 // RegisterCommands loads and registers all commands
