@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-func InitializeBot(c *config.Config) {
+func InitializeBot(config *config.Config) {
 	var intents = []gateway.Intents{
 		gateway.IntentGuilds,
 		gateway.IntentGuildMessages,
@@ -19,7 +19,7 @@ func InitializeBot(c *config.Config) {
 
 	router := cmdroute.NewRouter()
 
-	botState := state.New("Bot " + c.Discord.Token)
+	botState := state.New("Bot " + config.Discord.Token)
 	botState.AddInteractionHandler(router)
 
 	for _, intent := range intents {
@@ -27,7 +27,7 @@ func InitializeBot(c *config.Config) {
 	}
 
 	RegisterCommands(router, botState)
-	listeners.RegisterListeners(c, botState)
+	listeners.RegisterListeners(config, botState)
 
 	if err := botState.Connect(context.TODO()); err != nil {
 		log.Println("cannot connect:", err)
