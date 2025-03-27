@@ -2,15 +2,17 @@ package commands
 
 import (
 	"context"
-	"discord-bot-tickets/bot/commands/helpers"
+	"discord-bot-tickets/bot/commands/helpers/colors"
+	"discord-bot-tickets/bot/services"
+
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
 )
 
-func PingCommand(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func PingCommand(ctx context.Context, service *services.BotService, data cmdroute.CommandData) *api.InteractionResponseData {
 	embed := discord.Embed{
-		Color: helpers.Color("ff3333"),
+		Color: colors.GetColor(colors.Green),
 		Fields: []discord.EmbedField{
 			{
 				Value: "Pong! 🏓",

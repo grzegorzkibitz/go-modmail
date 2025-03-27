@@ -3,11 +3,13 @@ package bot
 import (
 	"context"
 	"discord-bot-tickets/bot/listeners"
+	"discord-bot-tickets/bot/services"
 	"discord-bot-tickets/config"
+	"log"
+
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
-	"log"
 )
 
 func InitializeBot(config *config.Config) {
@@ -26,8 +28,11 @@ func InitializeBot(config *config.Config) {
 		botState.AddIntents(intent)
 	}
 
-	RegisterCommands(router, botState)
-	listeners.RegisterListeners(config, botState)
+	// Create bot service
+	botService := services.NewBotService(config, botState)
+
+	RegisterCommands(router, botService)
+	listeners.RegisterListeners(botService)
 
 	if err := botState.Connect(context.TODO()); err != nil {
 		log.Println("cannot connect:", err)

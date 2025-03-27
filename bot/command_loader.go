@@ -3,36 +3,37 @@ package bot
 import (
 	"context"
 	"discord-bot-tickets/bot/commands"
+	"discord-bot-tickets/bot/services"
+	"log"
+
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
-	"github.com/diamondburned/arikawa/v3/state"
-	"log"
 )
 
 // CommandHandler represents a Discord command handler
-type CommandHandler func(context.Context, cmdroute.CommandData) *api.InteractionResponseData
+type CommandHandler func(ctx context.Context, service *services.BotService, data cmdroute.CommandData) *api.InteractionResponseData
 
 // CommandRegistry holds all registered commands
-var CommandRegistry = map[string]CommandHandler{}
+var CommandRegistry = map[string]CommandHandler{
+	"ping":  commands.PingCommand,
+	"reply": commands.ReplyCommand,
+}
 
 // CommandData holds all command data
 var commandData = []api.CreateCommandData{
 	{Name: "ping", Description: commands.GetPingDescription(), DescriptionLocalizations: commands.GetPingLocale()},
+	{Name: "reply", Description: commands.GetReplyDescription(), DescriptionLocalizations: commands.GetReplyLocale(), Options: commands.GetReplyOptions()},
 }
 
 // RegisterCommands loads and registers all commands
-func RegisterCommands(router *cmdroute.Router, state *state.State) {
-	for _, cmd := range commandData {
-		switch cmd.Name {
-		case "ping":
-			CommandRegistry[cmd.Name] = commands.PingCommand
-			router.AddFunc("ping", func(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-				return commands.PingCommand(ctx, data)
-			})
-		}
+func RegisterCommands(router *cmdroute.Router, service *services.BotService) {
+	for name, handler := range CommandRegistry {
+		router.AddFunc(name, func(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+			return handler(ctx, service, data)
+		})
 	}
 
-	if err := cmdroute.OverwriteCommands(state, commandData); err != nil {
+	if err := cmdroute.OverwriteCommands(service.State(), commandData); err != nil {
 		log.Fatalln("cannot update commands:", err)
 	}
 

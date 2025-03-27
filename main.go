@@ -4,7 +4,7 @@ import (
 	"discord-bot-tickets/bot"
 	"discord-bot-tickets/config"
 	"discord-bot-tickets/database"
-	"fmt"
+	logger "discord-bot-tickets/logging"
 	"log"
 )
 
@@ -14,7 +14,9 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
-	fmt.Println("Config loaded successfully:", cfg)
+	if err := logger.Init(); err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	// Pass the configuration to the database connection function
 	db, err := database.Connect(cfg)
